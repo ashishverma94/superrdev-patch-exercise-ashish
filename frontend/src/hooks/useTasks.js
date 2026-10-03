@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { fetchTasks } from '../api';
+import { useState, useEffect } from "react";
+import { fetchTasks } from "../api";
+import { useDebounce } from "./useDebounce";
 
 export function useTasks(query, status, page, pageSize) {
   const [tasks, setTasks] = useState([]);
@@ -7,10 +8,13 @@ export function useTasks(query, status, page, pageSize) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const debouncedQuery = useDebounce(query, 1000);
+
   useEffect(() => {
     setLoading(true);
+    setError(null);
 
-    fetchTasks({ query, status, page, pageSize })
+    fetchTasks({ query: debouncedQuery, status, page, pageSize })
       .then((data) => {
         setTasks(data.items);
         setTotal(data.total);
@@ -18,8 +22,11 @@ export function useTasks(query, status, page, pageSize) {
       })
       .catch((err) => {
         setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, [query, status, page, pageSize]);
+  }, [debouncedQuery, status, page, pageSize]);
 
   return { tasks, total, loading, error };
 }

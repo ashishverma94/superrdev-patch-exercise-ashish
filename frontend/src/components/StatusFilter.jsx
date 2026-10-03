@@ -1,6 +1,13 @@
-export default function StatusFilter({ value, onChange }) {
+export default function StatusFilter({ value, onChange, setPage }) {
   return (
-    <select className="status-filter" value={value} onChange={(e) => onChange(e.target.value)}>
+    <select
+      className="status-filter"
+      value={value}
+      onChange={(e) => {
+        onChange(e.target.value);
+        setPage(1);
+      }}
+    >
       <option value="">All statuses</option>
       <option value="OPEN">Open</option>
       <option value="IN_PROGRESS">In Progress</option>
